@@ -1,0 +1,12 @@
+# IDE
+/.idea/
+
+# Build
+/target/
+
+# Private
+/src/test/
+
+# Properties
+/connections.properties
+/jira.properties
