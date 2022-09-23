@@ -4,6 +4,7 @@ import dev.anthonyashco.exceptions.HTTPException;
 import com.google.gson.*;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Base64;
 import java.util.Properties;
@@ -23,7 +24,12 @@ public class JiraUtil {
      */
     private String getB64AuthKey() {
         String credentials = prop.getProperty("user") + ":" + prop.get("pass");
-        return Base64.getEncoder().encodeToString(credentials.getBytes());
+        return Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public static String generateB64AuthKey(String user, String pass) {
+        String credentials = user + ":" + pass;
+        return Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
     }
 
     public JiraUtil() throws IOException, HTTPException {
@@ -81,7 +87,7 @@ public class JiraUtil {
             payload.addProperty("name", cycleName);
             payload.addProperty("projectId", projectId);
             payload.addProperty("versionId", versionId);
-            JsonObject json = url.postJson("rest/zapi/latest/cycle", payload);
+            JsonObject json = url.postJson("rest/zapi/latest/cycle/", payload);
             return json.get("id").getAsString();
         }
     }
@@ -223,5 +229,10 @@ public class JiraUtil {
         boolean executionStatus = updateExecutionStatus(executionId, statusCode);
         boolean attachStatus = attachExecutionReport(executionId, reportPath, fileMimeType);
         return (executionStatus && attachStatus);
+    }
+
+    public static void main(String[] args) throws HTTPException, IOException {
+        JiraUtil ju = new JiraUtil();
+        System.out.println(ju.getB64AuthKey());
     }
 }
